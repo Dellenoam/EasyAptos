@@ -125,7 +125,7 @@ poetry install -только главная
 
 ## Запустите скрипт
 
-<!-- ![Вступление к EasyAptos](https://github.com/Dellenoam/EasyAptos/blob/master/assets/EasyAptos_Intro.gif) -->
+![EasyAptos Intro](https://github.com/Dellenoam/EasyAptos/blob/master/assets/EasyAptos_Intro.gif)
 
 ### Использование start.bat
 

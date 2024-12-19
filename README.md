@@ -125,7 +125,7 @@ You can configure the script by editing the `config/user_config.py` file. To lea
 
 ## Run the script
 
-<!-- ![EasyAptos Intro](https://github.com/Dellenoam/EasyAptos/blob/master/assets/EasyAptos_Intro.gif) -->
+![EasyAptos Intro](https://github.com/Dellenoam/EasyAptos/blob/master/assets/EasyAptos_Intro.gif)
 
 ### Using start.bat
 
