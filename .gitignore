@@ -1,0 +1,9 @@
+idea
+.vscode
+.DS_STORE
+__pycache__
+.venv
+output/*
+!output/.gitkeep
+wallets.csv
+.env
