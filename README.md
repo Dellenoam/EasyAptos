@@ -123,6 +123,10 @@ poetry install --only main
 
 You can configure the script by editing the `config/user_config.py` file. To learn more about options, see the [settings](#settings).
 
+### How to import wallets
+
+To import wallets into the script, create a table wallets.csv in the root directory of the script. For an example, see [wallets_template.csv](https://github.com/Dellenoam/EasyAptos/blob/master/wallets_template.csv).
+
 ## Run the script
 
 ![EasyAptos Intro](https://github.com/Dellenoam/EasyAptos/blob/master/assets/EasyAptos_Intro.gif)

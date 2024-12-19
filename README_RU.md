@@ -123,6 +123,10 @@ poetry install -только главная
 
 Вы можете настроить скрипт, отредактировав файл `config/user_config.py`. Чтобы узнать больше о параметрах, ознакомьтесь с разделом [настройки](#settings).
 
+## Как импортировать кошельки
+
+Чтобы импортировать кошельки в скрипт, создайте таблицу wallets.csv в корневом каталоге скрипта. Для примера, смотрите [wallets_template.csv](https://github.com/Dellenoam/EasyAptos/blob/master/wallets_template.csv).
+
 ## Запустите скрипт
 
 ![EasyAptos Intro](https://github.com/Dellenoam/EasyAptos/blob/master/assets/EasyAptos_Intro.gif)
