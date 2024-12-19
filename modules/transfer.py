@@ -42,12 +42,10 @@ class TransferService:
     ) -> int:
         if use_all_balance:
             if sender_balance < estimated_gas_cost:
-                print(sender_balance, estimated_gas_cost)
                 raise Exception("Not enough balance to cover gas cost")
             return sender_balance - estimated_gas_cost
         else:
             if sender_balance < transfer_amount[1] * int(1e8) + estimated_gas_cost:
-                print(sender_balance, estimated_gas_cost)
                 raise Exception("Not enough balance to cover gas cost")
 
             return randint(
