@@ -11,17 +11,25 @@ from utils.spreadsheet_utils import write_balances_to_xlsx
 
 class BalanceChecker:
     def __init__(self, private_key: str):
-        self.account = Account.load_key(private_key)
-        self.client = self._get_client()
-        self.wallet_address = self.account.address().__repr__()
+        self._account = Account.load_key(private_key)
+        self._client = self._get_client()
+        self.wallet_address = self._account.address().__repr__()
 
     def _get_client(self) -> RestClient:
         if user_config.debug_mode:
             return RestClient(app_settings.aptos.APTOS_NODE_TESTNET_URL)
         return RestClient(app_settings.aptos.APTOS_NODE_MAINNET_URL)
 
+    async def __aenter__(self) -> "BalanceChecker":
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
+        await self._client.close()
+
     async def get_balances(self) -> Dict[str, Dict[str, int]]:
-        account_resources = await self.client.account_resources(self.account.address())
+        account_resources = await self._client.account_resources(
+            self._account.address()
+        )
 
         wallet_data = {}
 
@@ -49,22 +57,18 @@ async def check_wallet_balances(wallets: List[Tuple[str, str, str]]) -> None:
 
     print("\nChecking wallet balances...")
 
-    semaphore = (
-        asyncio.Semaphore(user_config.concurrency_limit)
-        if user_config.use_concurrency
-        else None
-    )
+    semaphore = asyncio.Semaphore(user_config.concurrency_limit)
 
     async def check_balance(wallet_data: Tuple[str, str, str]) -> None:
         wallet_name, private_key, _ = wallet_data
         try:
-            if semaphore:
+            if user_config.use_concurrency:
                 async with semaphore:
-                    balance_checker = BalanceChecker(private_key)
-                    wallet_balances = await balance_checker.get_balances()
+                    async with BalanceChecker(private_key) as balance_checker:
+                        wallet_balances = await balance_checker.get_balances()
             else:
-                balance_checker = BalanceChecker(private_key)
-                wallet_balances = await balance_checker.get_balances()
+                async with BalanceChecker(private_key) as balance_checker:
+                    wallet_balances = await balance_checker.get_balances()
 
             all_wallet_balances.append((wallet_name, wallet_balances))
         except AccountNotFound:

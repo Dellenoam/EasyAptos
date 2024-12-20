@@ -15,13 +15,19 @@ from utils.spreadsheet_utils import write_transactions_to_xlsx
 class TransferService:
     def __init__(self, private_key: str, destination_address: str):
         self._account = Account.load_key(private_key)
-        self.destination_address: str = destination_address
         self._client = self._get_client()
+        self.destination_address: str = destination_address
 
     def _get_client(self) -> RestClient:
         if user_config.debug_mode:
             return RestClient(app_settings.aptos.APTOS_NODE_TESTNET_URL)
         return RestClient(app_settings.aptos.APTOS_NODE_MAINNET_URL)
+
+    async def __aenter__(self) -> "TransferService":
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
+        await self._client.close()
 
     async def perform_transfer(self) -> Dict[str, str | int]:
         sender_balance = await self._client.account_balance(self._account.address())
@@ -98,22 +104,22 @@ class TransferService:
 async def start_transfer_process(wallets: List[Tuple[str, str, str]]) -> None:
     all_transaction_data = []
 
-    semaphore = (
-        asyncio.Semaphore(user_config.concurrency_limit)
-        if user_config.use_concurrency
-        else None
-    )
+    semaphore = asyncio.Semaphore(user_config.concurrency_limit)
 
     async def transfer(wallet_data: Tuple[str, str, str]) -> None:
         wallet_name, private_key, destination_address = wallet_data
         try:
-            if semaphore:
+            if user_config.use_concurrency:
                 async with semaphore:
-                    transfer_service = TransferService(private_key, destination_address)
-                    transaction_data = await transfer_service.perform_transfer()
+                    async with TransferService(
+                        private_key, destination_address
+                    ) as transfer_service:
+                        transaction_data = await transfer_service.perform_transfer()
             else:
-                transfer_service = TransferService(private_key, destination_address)
-                transaction_data = await transfer_service.perform_transfer()
+                async with TransferService(
+                    private_key, destination_address
+                ) as transfer_service:
+                    transaction_data = await transfer_service.perform_transfer()
 
             transaction_hash = cast(str, transaction_data.get("txn_hash", "N/A"))
             transfered_amount = cast(int, transaction_data.get("transfered_amount", 0))
@@ -129,15 +135,24 @@ async def start_transfer_process(wallets: List[Tuple[str, str, str]]) -> None:
             all_transaction_data.append((wallet_name, "N/A", "N/A"))
 
     if user_config.use_concurrency:
-        await asyncio.gather(*(transfer(wallet_data) for wallet_data in wallets))
+        chunk_size = user_config.concurrency_limit
+        chunks = [
+            wallets[i : i + chunk_size] for i in range(0, len(wallets), chunk_size)
+        ]
+        for chunk in chunks:
+            await asyncio.gather(*(transfer(wallet_data) for wallet_data in chunk))
+            if not chunk == chunks[-1]:
+                min_delay, max_delay = user_config.delay_between_transactions
+                random_sleep_time = uniform(min_delay, max_delay)
+                print(f"\nSleeping for {random_sleep_time} seconds...")
+                await asyncio.sleep(random_sleep_time)
     else:
         for wallet_data in wallets:
             await transfer(wallet_data)
-            if wallet_data is not wallets[-1]:
-                min_delay = user_config.delay_between_transactions[0]
-                max_delay = user_config.delay_between_transactions[1]
+            if not wallet_data == wallets[-1]:
+                min_delay, max_delay = user_config.delay_between_transactions
                 random_sleep_time = uniform(min_delay, max_delay)
-                print(f"\nSleeping for {random_sleep_time:.2f} seconds")
+                print(f"\nSleeping for {random_sleep_time} seconds...")
                 await asyncio.sleep(random_sleep_time)
 
     write_transactions_to_xlsx(

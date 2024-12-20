@@ -15,5 +15,5 @@ use_concurrency = True  # use concurrency (async)
 concurrency_limit = 10  # concurrency limit
 
 # General Settings
-play_intro = True  # play intro on start of the script
-debug_mode = False  # use testnet or mainnet
+play_intro = False  # play intro on start of the script
+debug_mode = True  # use testnet or mainnet
