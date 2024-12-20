@@ -88,7 +88,8 @@ async def check_wallet_balances(wallets: List[Tuple[str, str, str]]) -> None:
         return
 
     write_balances_to_xlsx(
-        app_settings.output.BALANCES_RESULT_PATH, "Wallets", sorted(all_wallet_balances)
+        app_settings.output.BALANCES_RESULT_PATH,
+        sorted(all_wallet_balances, key=lambda x: int(x[0])),
     )
 
     print(f"\nBalances checked and saved to {app_settings.output.BALANCES_RESULT_PATH}")

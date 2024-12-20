@@ -43,7 +43,6 @@ def read_wallets() -> List[Tuple[str, str, str]] | None:
 
 def write_balances_to_xlsx(
     filename: str,
-    wallet_name: str,
     all_wallet_balances: List[Tuple[str, Dict[str, Dict[str, int]]]],
 ) -> None:
     workbook = Workbook()

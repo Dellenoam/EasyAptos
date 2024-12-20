@@ -156,7 +156,8 @@ async def start_transfer_process(wallets: List[Tuple[str, str, str]]) -> None:
                 await asyncio.sleep(random_sleep_time)
 
     write_transactions_to_xlsx(
-        app_settings.output.TRANSACTIONS_RESULT_PATH, sorted(all_transaction_data)
+        app_settings.output.TRANSACTIONS_RESULT_PATH,
+        sorted(all_transaction_data, key=lambda x: int(x[0])),
     )
 
     print(
