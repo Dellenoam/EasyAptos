@@ -13,7 +13,7 @@ from modules.transfer import TransferService
 from modules.wallet_creator import WalletCreatorService
 from utils import banner_animation
 from utils.spreadsheet_utils import (
-    read_wallets_from_csv,
+    read_wallets,
     write_balances_to_xlsx,
     write_create_wallets_to_xlsx,
     write_transactions_to_xlsx,
@@ -26,7 +26,7 @@ async def main() -> NoReturn:
     else:
         banner_animation.print_script_text_art()
 
-    wallets = read_wallets_from_csv("wallets.csv")
+    wallets = read_wallets()
     if wallets is None:
         print(
             "\nNo wallets found in wallets.csv. Please add wallets or create new ones.\n"

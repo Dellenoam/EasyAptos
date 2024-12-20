@@ -125,7 +125,7 @@ You can configure the script by editing the `config/user_config.py` file. To lea
 
 ### How to import wallets
 
-To import wallets into the script, create a table wallets.csv in the root directory of the script. For an example, see [wallets_template.csv](https://github.com/Dellenoam/EasyAptos/blob/master/wallets_template.csv).
+To import wallets into the script, you need to insert private keys into private_keys.txt and recipients address into recipients.txt. The number of private keys must match the number of recipient addresses.
 
 ## Run the script
 

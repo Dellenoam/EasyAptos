@@ -1,4 +1,3 @@
-import csv
 import os
 from typing import Dict, List, Tuple
 
@@ -7,25 +6,37 @@ from openpyxl import Workbook
 from config.user_config import debug_mode
 
 
-def read_wallets_from_csv(filename: str) -> List[Tuple[str, str, str]] | None:
-    wallets = []
+def read_wallets() -> List[Tuple[str, str, str]] | None:
+    private_keys = []
+    destination_addresses = []
 
-    if not os.path.exists(filename):
+    private_keys_filename = "private_keys.txt"
+    destination_addresses_filename = "recipients.txt"
+
+    if not os.path.exists(private_keys_filename) or not os.path.exists(
+        destination_addresses_filename
+    ):
         return None
 
-    with open(filename, "r") as f:
-        reader = csv.reader(f)
-        next(reader)
-        for row in reader:
-            name, private_key, destination_address = row
+    with open(private_keys_filename, "r") as f:
+        private_keys = [line.strip() for line in f.readlines()]
 
-            if not name:
-                name = str(len(wallets) + 1)
+    with open(destination_addresses_filename, "r") as f:
+        destination_addresses = [line.strip() for line in f.readlines()]
 
-            if not private_key.startswith("ed25519-priv-"):
-                private_key = "ed25519-priv-" + private_key
+    if len(private_keys) != len(destination_addresses):
+        return None
 
-            wallets.append((name, private_key, destination_address))
+    wallets = []
+
+    for i, (private_key, destination_address) in enumerate(
+        zip(private_keys, destination_addresses)
+    ):
+        name = str(i + 1)
+        if not private_key.startswith("ed25519-priv-"):
+            private_key = "ed25519-priv-" + private_key
+
+        wallets.append((name, private_key, destination_address))
 
     return wallets
 
