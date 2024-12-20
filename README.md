@@ -81,6 +81,15 @@ Script for various tasks in the Aptos network
       <td>transfer_amount</td>
       <td>Transfer amount range (APT). If use_all_balance is True, the transfer amount will be the entire balance</td>
     </tr>
+    <!-- Async Settings -->
+    <tr>
+      <td>use_concurrency</td>
+      <td>True/False to indicate whether to use concurrency</td>
+    </tr>
+    <tr>
+      <td>concurrency_limit</td>
+      <td>Maximum number of concurrent requests</td>
+    </tr>
     <!-- General Settings -->
     <tr>
       <td>play_intro</td>

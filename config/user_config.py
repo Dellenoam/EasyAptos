@@ -10,6 +10,10 @@ retries = 3  # number of retries on transaction failure
 use_all_balance = False  # transfer all balance
 transfer_amount = [1, 2]  # transfer amount in APT. if use_all_balance is True, then this value will be ignored
 
+# Async Settings
+use_concurrency = True  # use concurrency (async)
+concurrency_limit = 10  # concurrency limit
+
 # General Settings
 play_intro = True  # play intro on start of the script
 debug_mode = False  # use testnet or mainnet

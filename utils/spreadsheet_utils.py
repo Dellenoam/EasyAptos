@@ -44,7 +44,7 @@ def read_wallets() -> List[Tuple[str, str, str]] | None:
 def write_balances_to_xlsx(
     filename: str,
     wallet_name: str,
-    all_wallets_data: List[Tuple[str, Dict[str, Dict[str, int]]]],
+    all_wallet_balances: List[Tuple[str, Dict[str, Dict[str, int]]]],
 ) -> None:
     workbook = Workbook()
 
@@ -56,9 +56,9 @@ def write_balances_to_xlsx(
 
     sheet.append(["Wallet Name", "Wallet Address", "APT"])
 
-    for wallet_name, wallet_data in all_wallets_data:
+    for wallet_name, wallet_data in all_wallet_balances:
         for wallet_address, balances in wallet_data.items():
-            apt_balance = balances.get("APT", 0.0)
+            apt_balance = balances.get("APT", "N/A")
             row = [wallet_name, wallet_address, apt_balance]
             sheet.append(row)
 
@@ -70,7 +70,7 @@ def write_balances_to_xlsx(
 
 
 def write_transactions_to_xlsx(
-    filename, all_transaction_data: List[Tuple[str, str, int]]
+    filename: str, all_transaction_data: List[Tuple[str, str, int]]
 ) -> None:
     workbook = Workbook()
 
@@ -83,12 +83,15 @@ def write_transactions_to_xlsx(
     sheet.append(["Wallet Name", "Transaction Link", "Transfered Amount (APT)"])
 
     for wallet_name, txn_hash, transfered_amount in all_transaction_data:
-        aptos_explorer_transaction_url = "https://explorer.aptoslabs.com/txn/"
-        aptos_explorer_transaction_url += txn_hash
-        if debug_mode:
-            aptos_explorer_transaction_url += "?network=testnet"
+        if txn_hash != "N/A":
+            aptos_explorer_transaction_url = "https://explorer.aptoslabs.com/txn/"
+            aptos_explorer_transaction_url += txn_hash
+            if debug_mode:
+                aptos_explorer_transaction_url += "?network=testnet"
+            else:
+                aptos_explorer_transaction_url += "?network=mainnet"
         else:
-            aptos_explorer_transaction_url += "?network=mainnet"
+            aptos_explorer_transaction_url = "N/A"
 
         sheet.append([wallet_name, aptos_explorer_transaction_url, transfered_amount])
 
