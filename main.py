@@ -1,5 +1,4 @@
 import asyncio
-import datetime
 import sys
 from random import uniform
 from typing import NoReturn, cast
@@ -8,6 +7,7 @@ from aptos_sdk.async_client import AccountNotFound
 
 from config.app_config import app_settings
 from config.user_config import delay_between_transactions, play_intro
+from exceptions.transfer import NotEnoughBalanceException
 from modules.balance_checker import get_balances
 from modules.transfer import TransferService
 from modules.wallet_creator import WalletCreatorService
@@ -53,6 +53,8 @@ async def check_wallet_balances(wallets) -> None:
         return
 
     all_wallets_data = []
+
+    print("\nChecking wallet balances...")
 
     for wallet_data in wallets:
         wallet_name, private_key, _ = wallet_data
@@ -106,6 +108,9 @@ async def start_transfer_process(wallets) -> None:
                 app_settings.output.TRANSACTIONS_RESULT_PATH,
                 all_transaction_data,
             )
+        except NotEnoughBalanceException:
+            print(f"\nNot enough balance to transfer from {wallet_name}. Skipping...")
+            continue
         except Exception as error:
             print(f"\nError transferring from {wallet_name} | Error: {error}")
 
